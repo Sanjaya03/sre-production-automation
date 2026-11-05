@@ -1,9 +1,9 @@
 # Enterprise Cloud Infrastructure & Compliance Automation (AWS & Terraform)
 
 ## Platform Overview
-Production Infrastructure as Code (IaC) repository provisioning cloud foundations for an enterprise Sales & Incentive Compensation Platform ($2B+ in annual commission payouts across 15,000+ sales personnel under strict SOX ITGC Section 404 compliance).
+Production Infrastructure as Code (IaC) repository provisioning cloud foundations for an enterprise **Sales & Incentive Compensation Platform** ($2B+ in annual commission payouts across 15,000+ sales personnel under strict SOX ITGC Section 404 compliance).
 
-Architecture Flow:
+```text
 [15,000 Sales Representatives / Upstream Order Feeds]
          │
          ▼
@@ -18,11 +18,13 @@ Architecture Flow:
    ├── SSE-KMS Encryption with Annual Key Rotation & Bucket Key
    ├── In-Transit TLS Enforcement (Deny non-HTTPS)
    └── FinOps Lifecycle Transition to S3 Glacier after 1 Year
+```
 
 ---
 
 ## Modular Architecture
 
+```text
 terraform/
 ├── modules/
 │   └── s3-oicarc-compliance/      # Statutory WORM archive module
@@ -32,6 +34,7 @@ terraform/
 └── environments/
     └── prod/                      # Production root deployment
         └── main.tf                # Environment-specific parameterization & output exports
+```
 
 ---
 
@@ -39,20 +42,30 @@ terraform/
 
 | Security Control | Implementation Primitive | Purpose |
 | :--- | :--- | :--- |
-| Data Immutability (WORM) | aws_s3_bucket_object_lock_configuration | Enforces non-bypassable COMPLIANCE mode for 4 years; prevents deletion or alteration by any identity, including root. |
-| Dual-Layer Authorization | aws_kms_key & aws_kms_alias | Customer Managed Key (CMK) enforcing Segregation of Duties (SoD); requires both s3:GetObject and kms:Decrypt. |
-| Cryptographic Rotation | enable_key_rotation = true | Automatic annual key rotation satisfying NIST SP 800-57 guidelines. |
-| FinOps Cost Optimization | bucket_key_enabled = true | Caches bucket-level keys in S3, reducing KMS API request charges by up to 99%. |
-| Data in Transit | aws_s3_bucket_policy | Explicit Deny statement rejecting any connection where aws:SecureTransport == false. |
-| Long-Term Retention | aws_s3_bucket_lifecycle_configuration | Automatically transitions settled archives to Glacier Flexible Retrieval after 365 days (80% cost reduction). |
+| **Data Immutability (WORM)** | `aws_s3_bucket_object_lock_configuration` | Enforces non-bypassable COMPLIANCE mode for 4 years; prevents deletion or alteration by any identity, including root. |
+| **Dual-Layer Authorization** | `aws_kms_key` & `aws_kms_alias` | Customer Managed Key (CMK) enforcing Segregation of Duties (SoD); requires both s3:GetObject and kms:Decrypt. |
+| **Cryptographic Rotation** | `enable_key_rotation = true` | Automatic annual key rotation satisfying NIST SP 800-57 guidelines. |
+| **FinOps Cost Optimization** | `bucket_key_enabled = true` | Caches bucket-level keys in S3, reducing KMS API request charges by up to 99%. |
+| **Data in Transit** | `aws_s3_bucket_policy` | Explicit Deny statement rejecting any connection where aws:SecureTransport == false. |
+| **Long-Term Retention** | `aws_s3_bucket_lifecycle_configuration` | Automatically transitions settled archives to Glacier Flexible Retrieval after 365 days (80% cost reduction). |
 
 ---
 
 ## Verification & Validation Commands
-- terraform init
-- terraform validate
-- terraform plan
+
+```bash
+# Initialize AWS Provider plugins
+terraform init
+
+# Validate syntax, schemas, and dependency graphs
+terraform validate
+
+# Inspect execution plan
+terraform plan
+```
+
+---
 
 ## Author
-Sanjaya Kumar Swain — Senior Site Reliability Engineer / Database Reliability Engineer (DBRE)
-Public Codebases: github.com/Sanjaya03
+**Sanjaya Kumar Swain** — Senior Site Reliability Engineer / Database Reliability Engineer (DBRE)  
+*Public Codebases: [github.com/Sanjaya03](https://github.com/Sanjaya03)*
